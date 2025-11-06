@@ -1,0 +1,114 @@
+================================================================================
+              ✅ PERBAIKAN: FIX "name" FIELD ERROR
+================================================================================
+
+ERROR: "name" is not allowed
+
+PENYEBAB: API tidak menerima field "name" dalam request!
+
+SOLUSI: Sudah dihapus field "name" sebelum kirim ke API
+
+================================================================================
+              PERUBAHAN YANG DILAKUKAN
+================================================================================
+
+FILE: src/scripts/pages/add-story/add-story-page.js
+
+SEBELUM:
+const formData = new FormData(addStoryForm);
+formData.set('lat', lat.toString());
+formData.set('lon', lon.toString());
+
+SESUDAH:
+const formData = new FormData(addStoryForm);
+formData.delete('name');  // ← DIHAPUS!
+formData.set('lat', lat.toString());
+formData.set('lon', lon.toString());
+
+================================================================================
+              REBUILD & TEST
+================================================================================
+
+STEP 1: REBUILD
+---------------
+Buka terminal di folder starter-project-with-webpack:
+
+npm run build
+
+TUNGGU: "webpack compiled successfully"
+
+STEP 2: SERVE
+-------------
+npm run serve
+
+TUNGGU: "Available on http://localhost:8080"
+
+STEP 3: HARD REFRESH
+--------------------
+1. Buka: http://localhost:8080
+2. PENTING: Ctrl+F5 (hard refresh)
+3. Atau buka Incognito/Private window
+
+STEP 4: TEST
+------------
+1. Login
+2. Klik "➕ Tambah Cerita"
+3. Isi form:
+   - Judul: "Test Story"
+   - Deskripsi: "Test description"
+   - KLIK PETA untuk koordinat
+   - Upload foto
+4. Submit
+
+STEP 5: CHECK CONSOLE
+---------------------
+Console harus menampilkan:
+
+FormData contents:
+  description: xxx
+  lat: xxx
+  lon: xxx
+  photo: File
+
+TIDAK ADA lagi field "name"!
+
+Responsenya harus sukses atau error lain (bukan "name is not allowed")
+
+================================================================================
+              VERIFIKASI
+================================================================================
+
+Setelah rebuild dan test:
+
+[√] Build berhasil
+[√] Hard refresh di browser
+[√] Submit form
+[√] Console TIDAK tampil field "name"
+[√] Error "name is not allowed" TIDAK muncul
+[√] Request berhasil atau error lain yang valid
+
+================================================================================
+              JIKA MASIH ERROR
+================================================================================
+
+Jika masih error setelah menghapus "name":
+
+1. Check console untuk pesan error baru
+2. Check Network tab untuk response body
+3. Laporkan pesan error lengkap
+
+Kemungkinan error baru (selain "name"):
+- Format foto tidak valid
+- Deskripsi terlalu panjang
+- Koordinat invalid
+- Token expired
+
+================================================================================
+
+                    npm run build
+                    npm run serve
+                    Ctrl+F5 di browser
+                    TEST!
+
+================================================================================
+

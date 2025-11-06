@@ -1,0 +1,55 @@
+============================================================
+   ✅ STORYMAP SUDAH JALAN DI BACKGROUND!
+============================================================
+
+🌐 BUKA BROWSER ANDA DAN AKSES:
+
+    http://localhost:8080
+
+============================================================
+   JIKA TIDAK TAMPIL, JALANKAN INI DI TERMINAL:
+============================================================
+
+BUKA PowerShell/CMD di folder ini, lalu ketik:
+
+    npm run serve
+
+Tunggu sampai muncul: "Available on http://localhost:8080"
+
+============================================================
+   METODE ALTERNATIF (JIKA PORT TERPAKAI):
+============================================================
+
+1. Tutup aplikasi yang pakai port 8080
+2. Atau ubah port di package.json file serve line
+3. Atau pakai Live Server:
+   - Install extension Live Server di VS Code
+   - Klik kanan dist/index.html
+   - Pilih "Open with Live Server"
+
+============================================================
+   MULAI GUNAKAN APLIKASI:
+============================================================
+
+1. BUKA: http://localhost:8080
+2. KLIK: "Daftar" untuk buat akun baru
+3. ISI: Form registrasi
+4. LOGIN: Dengan akun yang sudah dibuat
+5. EKSPLORASI: Peta dan cerita
+6. TAMBAH: Cerita baru Anda!
+
+============================================================
+   PENTING:
+============================================================
+
+✅ JANGAN tutup terminal yang menjalankan npm run serve
+✅ Pastikan INTERNET koneksi aktif
+✅ Refresh browser jika perlu (Ctrl + Shift + R)
+✅ Check console (F12) jika ada error
+
+============================================================
+
+                    SELAMAT MENCOBA! 🎉
+
+============================================================
+

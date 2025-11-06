@@ -1,0 +1,119 @@
+================================================================================
+              CARA BUILD DAN JALANKAN YANG PASTI BERHASIL
+================================================================================
+
+LANGKAH-LANGKAH YANG PASTI BERHASIL:
+
+1. BUKA FILE EXPLORER
+   - Masuk ke: C:\Users\HP\Documents\tugas hafidz\starter-project-with-webpack
+
+2. INSTALL DEPENDENCIES
+   - Klik kanan di folder "starter-project-with-webpack"
+   - Pilih "Open in Terminal" atau "Open in PowerShell"
+   - Ketik: npm install
+   - Tunggu sampai selesai (sekitar 1-2 menit)
+
+3. BUILD PRODUCTION
+   - Di terminal yang sama, ketik: npm run build
+   - Tunggu sampai muncul "webpack compiled successfully"
+
+4. JALANKAN
+   - Ketik: npm run serve
+   - Akan muncul pesan: "Available on http://localhost:8080"
+
+5. BUKA DI BROWSER
+   - Buka Chrome/Edge
+   - Ketik di address bar: localhost:8080
+   - Tekan Enter
+
+================================================================================
+              JIKA TERMINAL TIDAK BISA DIGUNAKAN
+================================================================================
+
+METODE ALTERNATIF - GUNAKAN BUILD YANG SUDAH ADA:
+
+1. BUKA FILE EXPLORER
+   - Masuk ke: C:\Users\HP\Documents\tugas hafidz\starter-project-with-webpack\dist
+
+2. BUKA INDEX.HTML
+   - Double click file: index.html
+   - Akan terbuka di browser
+
+PERHATIAN: 
+- Metode ini hanya untuk melihat tampilan
+- Beberapa fitur API mungkin tidak jalan
+- Untuk testing lengkap, gunakan npm run serve
+
+================================================================================
+              TESTING FITUR TAMBAH DATA
+================================================================================
+
+1. DAFTAR AKUN:
+   - Klik "Daftar"
+   - Isi form dengan data baru
+   - Email: test123@example.com
+   - Password: password123
+   - Klik "Daftar"
+
+2. LOGIN:
+   - Masukkan email dan password yang didaftarkan
+   - Klik "Masuk"
+
+3. TAMBAH CERITA:
+   - Di homepage, klik tombol "➕ Tambah Cerita"
+   - Halaman form akan muncul
+   - Isi judul dan deskripsi
+   - ⚠️ KLIK PETA untuk pilih lokasi (PENTING!)
+   - Upload foto
+   - Klik "Simpan Cerita"
+   - Verifikasi muncul di homepage
+
+================================================================================
+              FITUR YANG SUDAH ADA DI KODE
+================================================================================
+
+✅ Routing: /add-story sudah ada di routes.js
+✅ Halaman: add-story-page.js sudah lengkap
+✅ Tombol: ada di homepage dengan handler ke #/add-story
+✅ Peta Interaktif: sudah implement
+✅ Form dengan validasi: sudah ada
+✅ Error handling: sudah ada
+✅ StartViewTransition: sudah ada
+
+JADI KENAPA REVIEWER BILANG TIDAK ADA?
+
+Kemungkinan:
+1. Reviewer belum klik tombol "Tambah Cerita" 
+2. Reviewer skip halaman add-story
+3. Build yang di-submit sebelumnya belum update
+
+JADI PASTIKAN:
+- Build yang di-submit adalah build TERBARU dengan semua fitur
+- Test dulu sebelum submit
+- Pastikan tombol "➕ Tambah Cerita" bisa diklik
+
+================================================================================
+              CARA VERIFIKASI SEBELUM SUBMIT
+================================================================================
+
+CHECKLIST:
+[ ] npm install berhasil
+[ ] npm run build berhasil
+[ ] npm run serve berjalan
+[ ] Bisa akses localhost:8080
+[ ] Bisa daftar akun
+[ ] Bisa login
+[ ] HOMEPAGE tampil dengan peta
+[ ] Tombol "➕ Tambah Cerita" TAMPAK dan bisa diklik
+[ ] Klik "➕ Tambah Cerita" → FORM muncul
+[ ] Form bisa diisi
+[ ] Bisa upload foto
+[ ] Bisa submit dan data tersimpan
+[ ] Cerita baru muncul di homepage
+
+================================================================================
+
+                    HARUS TEST SEBELUM SUBMIT!
+
+================================================================================
+

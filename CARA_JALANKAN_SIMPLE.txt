@@ -1,0 +1,105 @@
+================================================================================
+                    CARA JALANKAN STORYMAP - VERSI SIMPLE
+================================================================================
+
+⭐ METODE TERMUDAH - COPY PASTE INI KE TERMINAL:
+
+    cd "C:\Users\HP\Documents\tugas hafidz\starter-project-with-webpack"
+    npm run start-dev
+
+Tunggu sampai muncul pesan "webpack compiled successfully" atau "webpack compiled with warnings"
+
+Lalu buka browser dan akses: http://localhost:8080
+
+================================================================================
+                      JIKA MASIH ERROR
+================================================================================
+
+1. PASTIKAN DI FOLDER YANG BENAR
+   Buka terminal/PowerShell di folder:
+   C:\Users\HP\Documents\tugas hafidz\starter-project-with-webpack
+
+2. COBA METHODE ALTERNATIF:
+   
+   METODE A: Pakai Production Build (Lebih Stabil)
+   -----------------------------------------------
+   npm run build
+   npm run serve
+   
+   Lalu buka: http://localhost:8080
+
+   METODE B: Pakai Live Server (Jika tersedia)
+   -------------------------------------------
+   Klik kanan pada file dist/index.html
+   Pilih "Open with Live Server"
+
+================================================================================
+                      JIKA PORT 8080 TERPAKAI
+================================================================================
+
+Jika muncul error "Port 8080 already in use", buka file:
+starter-project-with-webpack/webpack.dev.js
+
+Cari baris: port: 8080
+
+Ganti dengan port lain, contoh:
+port: 3000
+
+Lalu jalankan lagi: npm run start-dev
+
+Akses dengan: http://localhost:3000
+
+================================================================================
+                      CHECKLIST SEBELUM JALANIN
+================================================================================
+
+[√] Node.js sudah terinstall (cek dengan: node -v)
+[√] NPM sudah terinstall (cek dengan: npm -v)
+[√] Sudah install dependencies (npm install)
+[√] Koneksi internet aktif
+[√] Di folder yang benar
+
+================================================================================
+                      ERROR YANG SERING MUNCUL
+================================================================================
+
+ERROR: "npm is not recognized"
+SOLUSI: Install Node.js dari nodejs.org
+
+ERROR: "Cannot find module"
+SOLUSI: Jalankan: npm install
+
+ERROR: "Port already in use"
+SOLUSI: Ganti port di webpack.dev.js atau tutup aplikasi lain
+
+ERROR: "Execution Policy"
+SOLUSI: Buka PowerShell sebagai Administrator, ketik:
+        Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned
+
+ERROR: "Connection refused"
+SOLUSI: Pastikan npm run start-dev masih berjalan di terminal
+
+================================================================================
+                      TIPS PENTING
+================================================================================
+
+1. JANGAN TUTUP TERMINAL yang menjalankan npm run start-dev
+2. Refresh browser dengan Ctrl + Shift + R untuk hard refresh
+3. Cek console browser (F12) kalau ada error
+4. Pastikan internet koneksi aktif untuk Story API
+
+================================================================================
+                      CONTACT
+================================================================================
+
+Kalau masih error, screenshot errornya dan cek:
+- README.md untuk dokumentasi lengkap
+- CARA_MENGGUNAKAN.md untuk panduan detail
+- Console browser (F12) untuk error log
+
+================================================================================
+
+                       GOOD LUCK! 🍀
+
+================================================================================
+

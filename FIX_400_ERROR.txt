@@ -1,0 +1,199 @@
+================================================================================
+              ✅ PERBAIKAN: 400 BAD REQUEST ERROR
+================================================================================
+
+ISSUE: Error 400 saat submit form Add Story
+
+SOLUSI: Sudah ditambahkan:
+1. Validasi batas maksimal deskripsi (1000 karakter)
+2. Logging error yang lebih detail
+3. Console logging untuk debugging
+
+================================================================================
+              PERUBAHAN YANG DILAKUKAN
+================================================================================
+
+1. API.JS
+---------
+Ditambahkan console.error untuk log error dari API:
+```javascript
+if (!fetchResponse.ok) {
+  result.error = true;
+  console.error('API Error:', result);  // NEW
+}
+```
+
+2. ADD-STORY-PAGE.JS
+--------------------
+a) Validasi batas maksimal deskripsi:
+```javascript
+if (descLength > 1000) {
+  errorDisplay.textContent = 'Deskripsi maksimal 1000 karakter';
+  // ...
+}
+```
+
+b) Logging error response:
+```javascript
+console.error('Failed to add story:', response);  // NEW
+```
+
+================================================================================
+              CARA REBUILD & TEST
+================================================================================
+
+STEP 1: REBUILD
+---------------
+Buka terminal di folder starter-project-with-webpack:
+
+    npm install
+    npm run build
+
+STEP 2: JALANKAN
+---------------
+    npm run serve
+
+STEP 3: TEST DENGAN DATA MINIMAL
+---------------------------------
+1. Login
+2. Klik "➕ Tambah Cerita"
+3. Isi form:
+   - Name: "Test Story"
+   - Description: "This is a test description" (30 karakter)
+   - **KLIK PETA** untuk pilih koordinat
+   - Upload foto kecil (< 500KB, JPG)
+4. Submit
+
+STEP 4: CHECK CONSOLE
+----------------------
+Buka Console (F12) dan lihat:
+- FormData contents: semua field ada
+- API Error: (jika error) pesan lengkap dari server
+- Failed to add story: (jika error) response object
+
+================================================================================
+              TROUBLESHOOTING
+================================================================================
+
+JIKA MASIH ERROR 400:
+
+1. CHECK DESKRIPSI LENGTH
+   - Jangan terlalu panjang
+   - Test dengan < 100 karakter dulu
+
+2. CHECK FOTO
+   - Ukuran < 500KB
+   - Format JPG atau PNG
+   - Upload foto yang valid (bukan corrupt)
+
+3. CHECK KOORDINAT
+   - Pastikan sudah klik peta
+   - Lat/lon harus terisi otomatis
+   - Range valid: lat[-90,90], lon[-180,180]
+
+4. CHECK TOKEN
+   - Token mungkin expired
+   - Coba logout → login ulang
+   - Check localStorage: ada 'authToken'?
+
+5. CHECK API RESPONSE
+   - Lihat console: "API Error:" message
+   - Lihat Network tab: response body
+   - Copy pesan error lengkap
+
+6. SIMPLE TEST
+   - Name: "Test"
+   - Description: "Short test" (11 karakter)
+   - Click peta
+   - Foto kecil (50KB)
+   - Submit
+
+================================================================================
+              ERROR MESSAGES YANG MUNGKIN MUNCUL
+================================================================================
+
+"deskripsi harus minimal 10 karakter"
+→ Deskripsi terlalu pendek, tambahkan karakter
+
+"deskripsi maksimal 1000 karakter"
+→ Deskripsi terlalu panjang, kurangi
+
+"Silakan pilih lokasi di peta"
+→ Belum klik peta untuk pilih koordinat
+
+"Failed to load resource: 400"
+→ Ada masalah dengan data yang dikirim
+→ Check console untuk pesan error lengkap
+
+"invalid token" atau 401
+→ Token expired, logout → login ulang
+
+================================================================================
+              CHECKLIST TESTING
+================================================================================
+
+Test minimal data:
+
+[ ] npm run build berhasil
+[ ] npm run serve berjalan
+[ ] Login sukses
+[ ] Form add story tampil
+[ ] Isi name: "Test"
+[ ] Isi description: "This is test" (15 karakter)
+[ ] KLIK PETA untuk koordinat
+[ ] Upload foto kecil (< 500KB)
+[ ] Submit
+[ ] Check console: tidak ada error 400
+[ ] Success message tampil
+[ ] Redirect ke beranda
+[ ] Cerita baru muncul di list
+
+================================================================================
+              JIKA MASIH ERROR
+================================================================================
+
+Jika setelah rebuild dan test masih error 400:
+
+1. Copy pesan error lengkap dari:
+   - Console: "API Error:" message
+   - Network tab: Response body
+
+2. Test dengan Postman/curl:
+   - Buka Postman
+   - POST https://story-api.dicoding.dev/v1/stories
+   - Header: Authorization: Bearer YOUR_TOKEN
+   - Body: multipart/form-data
+   - Fields: photo, description, lat, lon, name
+   - Lihat response
+
+3. Check API documentation:
+   - https://story-api.dicoding.dev/v1/
+   - Lihat requirement fields
+
+4. Report findings:
+   - Error message
+   - Data yang dikirim
+   - Response dari server
+
+================================================================================
+              KESIMPULAN
+================================================================================
+
+✅ Validasi deskripsi sudah ditambah
+✅ Logging error sudah lengkap
+✅ Perlu rebuild untuk apply changes
+✅ Test dengan data minimal dulu
+
+LANGKAH SELANJUTNYA:
+1. npm run build
+2. npm run serve  
+3. Test dengan data minimal
+4. Check console untuk error message
+5. Jika error, laporkan pesan error lengkap
+
+================================================================================
+
+                    GOOD LUCK!
+
+================================================================================
+

@@ -1,0 +1,71 @@
+================================================================================
+              ⚠️ TERMINAL HARUS DI FOLDER YANG BENAR!
+================================================================================
+
+ERROR: "Missing script: 'build'"
+
+MASALAH: Terminal berada di folder SALAH!
+
+================================================================================
+              CARA YANG BENAR
+================================================================================
+
+BUKA TERMINAL YANG BENAR:
+
+1. Buka File Explorer
+2. Masuk ke: C:\Users\HP\Documents\tugas hafidz\starter-project-with-webpack
+3. Klik kanan DI DALAM folder "starter-project-with-webpack"
+4. Pilih "Open PowerShell window here" atau "Open in Terminal"
+
+ATAU:
+
+Di VS Code:
+1. Klik File > Open Folder
+2. Pilih: starter-project-with-webpack
+3. Buka terminal di VS Code (Ctrl+`)
+4. Pastikan terminal berada di folder starter-project-with-webpack
+
+================================================================================
+              VERIFIKASI
+================================================================================
+
+Pastikan di terminal TAMPIL:
+
+PS C:\Users\HP\Documents\tugas hafidz\starter-project-with-webpack>
+
+ATAU:
+
+C:\Users\HP\Documents\tugas hafidz\starter-project-with-webpack>
+
+JIKA TIDAK TAMPIL: Terminal di folder SALAH!
+
+================================================================================
+              SETELAH DI FOLDER BENAR
+================================================================================
+
+Copy-paste:
+
+npm run build
+
+Tekan Enter, tunggu "webpack compiled successfully"
+
+Lalu:
+
+npm run serve
+
+================================================================================
+              COMMAND LENGKAP
+================================================================================
+
+Jika terminal di folder SALAH, pakai:
+
+cd "C:\Users\HP\Documents\tugas hafidz\starter-project-with-webpack"
+npm run build
+npm run serve
+
+================================================================================
+
+                    PASTIKAN DI FOLDER YANG BENAR!
+
+================================================================================
+

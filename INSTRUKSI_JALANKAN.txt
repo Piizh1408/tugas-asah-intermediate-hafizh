@@ -1,0 +1,139 @@
+================================================================================
+                    PANDUAN MENJALANKAN STORYMAP
+================================================================================
+
+Server development TELAH DIJALANKAN di background!
+
+Cara mengakses aplikasi:
+1. Buka web browser Anda (Chrome, Edge, Firefox)
+2. Ketik di address bar: http://localhost:8080
+3. Tekan Enter
+
+Aplikasi akan terbuka dan siap digunakan!
+
+================================================================================
+                           ALUR PENGGUNAAN
+================================================================================
+
+STEP 1: DAFTAR AKUN
+--------------------
+1. Klik tombol "Daftar" di menu navigasi
+2. Isi form:
+   - Nama (contoh: John Doe)
+   - Email (contoh: john@example.com)
+   - Password (minimal 8 karakter)
+3. Klik "Daftar"
+4. Tunggu sampai muncul pesan "Registrasi berhasil"
+
+STEP 2: LOGIN
+-------------
+1. Klik tombol "Masuk" di menu navigasi
+2. Masukkan email dan password yang sudah didaftarkan
+3. Klik "Masuk"
+4. Anda akan diarahkan ke Homepage dengan peta
+
+STEP 3: EKSPLORASI PETA
+------------------------
+1. Homepage menampilkan peta Indonesia dengan marker cerita
+2. Sidebar kanan menampilkan daftar cerita
+3. Klik marker di peta untuk melihat detail popup
+4. Gunakan tombol filter (Semua, Sains, Sejarah, Alam) untuk mencari
+
+STEP 4: TAMBAH CERITA BARU
+---------------------------
+1. Klik tombol "➕ Tambah Cerita" di Homepage
+2. Isi form:
+   - Judul: nama cerita Anda
+   - Deskripsi: minimal 10 karakter
+   - Latitude: -90 sampai 90 (contoh: -7.2575 untuk Jawa Timur)
+   - Longitude: -180 sampai 180 (contoh: 112.7521)
+   - Photo: pilih file gambar (max 2MB)
+3. Preview foto akan muncul setelah upload
+4. Klik "Simpan Cerita"
+5. Tunggu sampai muncul pesan sukses
+6. Cerita baru akan muncul di peta
+
+STEP 5: LOGOUT
+--------------
+1. Klik tombol "Keluar" di menu navigasi
+2. Session dihapus dan kembali ke halaman login
+
+================================================================================
+                           JIKA SERVER BERHENTI
+================================================================================
+
+Buka PowerShell/Command Prompt di folder ini, lalu ketik:
+
+    npm run start-dev
+
+Tunggu sampai muncul pesan "webpack compiled successfully"
+
+================================================================================
+                           TROUBLESHOOTING
+================================================================================
+
+MASALAH: Browser menampilkan "Cannot connect to localhost"
+SOLUSI:  Pastikan npm run start-dev masih berjalan di terminal
+
+MASALAH: "Failed to fetch stories" atau Error API
+SOLUSI:  Pastikan internet koneksi aktif
+
+MASALAH: Peta tidak muncul
+SOLUSI:  - Refresh halaman (F5)
+         - Pastikan koneksi internet baik
+         - Cek console browser (F12) untuk error
+
+MASALAH: Photo tidak bisa di-upload
+SOLUSI:  - Pastikan file format JPG, PNG, atau GIF
+         - Ukuran maksimal 2MB
+         - Kompres foto jika terlalu besar
+
+MASALAH: Validasi koordinat error
+SOLUSI:  - Latitude: -90 sampai 90
+         - Longitude: -180 sampai 180
+         - Gunakan titik desimal (.), bukan koma (,)
+
+================================================================================
+                           HOTKEYS
+================================================================================
+
+Browser:
+- Ctrl + Shift + R  : Hard refresh (clear cache)
+- F12              : Buka Developer Tools
+- Ctrl + K         : Auto-skip to main content
+
+Keyboard Navigation:
+- Tab              : Pindah ke elemen berikutnya
+- Shift + Tab      : Kembali ke elemen sebelumnya
+- Enter            : Aktifkan button/form
+- Esc              : Tutup modal/drawer
+
+================================================================================
+                           TESTING CHECKLIST
+================================================================================
+
+Fitur Wajib:
+[ ] Registrasi user berhasil
+[ ] Login berhasil
+[ ] Peta menampilkan marker cerita
+[ ] List cerita di sidebar muncul
+[ ] Filter lokasi berfungsi
+[ ] Form tambah cerita berfungsi
+[ ] Upload foto berhasil
+[ ] Validasi input berfungsi
+[ ] Logout berfungsi
+
+Aksesibilitas:
+[ ] Semua gambar ada alt text
+[ ] Form ada label
+[ ] Keyboard navigation berfungsi
+[ ] Focus indicators terlihat
+
+================================================================================
+
+                 SELAMAT MENCOBA STORYMAP! 🎉📖🗺️
+
+Aplikasi siap untuk submission Dicoding Web Intermediate.
+
+================================================================================
+

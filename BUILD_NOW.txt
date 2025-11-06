@@ -1,0 +1,94 @@
+================================================================================
+              ⚠️ PENTING: REBUILD WAJIB DILAKUKAN!
+================================================================================
+
+Console masih menunjukkan error karena aplikasi belum di-rebuild!
+
+Perbaikan sudah dibuat di source code, tapi dist/ masih versi LAMA.
+
+================================================================================
+              CARA REBUILD (COPY-PASTE SAJA)
+================================================================================
+
+BUKA TERMINAL:
+
+1. Klik kanan folder "starter-project-with-webpack"
+2. Pilih "Open PowerShell window here" atau "Open in Terminal"
+
+LALU COPY-PASTE PERINTAH INI:
+
+    npm run build
+
+TUNGGU sampai muncul "webpack compiled successfully"
+
+================================================================================
+              JIKA TERMINAL ERROR
+================================================================================
+
+Jika muncul error "Missing script: build":
+
+Copy-paste ini:
+    
+    npm install
+    npm run build
+
+================================================================================
+              JIKA POWERSHELL BLOCKED
+================================================================================
+
+Jika muncul error ExecutionPolicy:
+
+Copy-paste ini:
+    
+    Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+
+Tekan Y
+
+Lalu:
+    
+    npm run build
+
+================================================================================
+              SETELAH BUILD SELESAI
+================================================================================
+
+Copy-paste ini:
+
+    npm run serve
+
+Buka browser: http://localhost:8080
+
+Hard refresh: Ctrl+F5
+
+Test lagi!
+
+================================================================================
+              VERIFIKASI BUILD BERHASIL
+================================================================================
+
+Setelah npm run build:
+
+[√] Tampil "webpack compiled successfully"
+[√] Tidak ada error merah
+[√] Folder dist/ ada
+[√] dist/app.bundle.js ada
+
+================================================================================
+              TEST SETELAH REBUILD
+================================================================================
+
+1. Buka http://localhost:8080
+2. Ctrl+F5 (hard refresh)
+3. Login
+4. Test tambah cerita lagi
+
+SEKARANG console akan menampilkan:
+- "API Error:" (jika ada error dari server)
+- "Failed to add story:" (dengan pesan lengkap)
+
+================================================================================
+
+                    JANGAN LUPA REBUILD!
+
+================================================================================
+

@@ -1,0 +1,132 @@
+================================================================================
+              SOLUSI PASTI: TERMINAL DI FOLDER SALAH!
+================================================================================
+
+ERROR: "Missing script: serve"
+MASALAH: Terminal di folder salah!
+PATH: PS C:\Users\HP\Documents\tugas hafidz>
+
+Yang benar: PS C:\Users\HP\Documents\tugas hafidz\starter-project-with-webpack>
+
+================================================================================
+              CARA YANG PASTI BERHASIL
+================================================================================
+
+METODE 1: BUKA TERMINAL BARU DI FOLDER BENAR
+---------------------------------------------
+
+1. Buka File Explorer (Windows + E)
+2. Masuk ke: C:\Users\HP\Documents\tugas hafidz\starter-project-with-webpack
+3. Klik kanan DI DALAM folder "starter-project-with-webpack"
+4. Pilih "Open PowerShell window here"
+5. Pastikan terminal tampil:
+   PS C:\Users\HP\Documents\tugas hafidz\starter-project-with-webpack>
+6. Lalu jalankan:
+   
+   npm run build
+   
+   npm run serve
+
+================================================================================
+              METODE 2: PINDAH DARI TERMINAL YANG SUDAH ADA
+-----------------------------------------------------------------------------
+
+Di terminal yang sekarang (PS C:\Users\HP\Documents\tugas hafidz>), ketik:
+
+cd starter-project-with-webpack
+
+Tekan Enter
+
+Terminal harus tampil:
+PS C:\Users\HP\Documents\tugas hafidz\starter-project-with-webpack>
+
+Lalu jalankan:
+
+npm run build
+
+npm run serve
+
+================================================================================
+              COMMAND LENGKAP COPY-PASTE
+================================================================================
+
+Copy-paste SEMUA perintah ini:
+
+cd starter-project-with-webpack
+npm run build
+npm run serve
+
+Tekan Enter setelah masing-masing command.
+
+================================================================================
+              VERIFIKASI FOLDER BENAR
+================================================================================
+
+Terminal HARUS tampil:
+
+PS C:\Users\HP\Documents\tugas hafidz\starter-project-with-webpack>
+
+JIKA TIDAK TAMPIL:
+- Salah folder
+- Ulangi langkah di atas
+
+JIKA TAMPIL:
+- Folder benar
+- Bisa jalankan npm run build dan npm run serve
+
+================================================================================
+              JIKA MASIH ERROR
+================================================================================
+
+Jika setelah cd starter-project-with-webpack, masih error:
+
+1. Pastikan folder ada:
+   - Buka File Explorer
+   - Masuk ke: C:\Users\HP\Documents\tugas hafidz
+   - Lihat apakah ada folder "starter-project-with-webpack"
+   
+2. Jika folder tidak ada:
+   - Folder proyek hilang atau di tempat lain
+   - Cek di Documents atau Downloads
+
+3. Jika folder ada tapi npm run build error:
+   - Jalankan: npm install
+   - Tunggu selesai
+   - Lalu: npm run build
+
+================================================================================
+              TROUBLESHOOTING
+================================================================================
+
+Q: "cd starter-project-with-webpack" tidak bisa
+A: Folder tidak ada atau nama berbeda
+   Cek di File Explorer
+
+Q: "Missing script: build"
+A: Pastikan di folder starter-project-with-webpack
+   Cek: pwd (PowerShell: Get-Location)
+
+Q: "webpack not found"
+A: Dependencies belum diinstall
+   Jalankan: npm install
+
+================================================================================
+              CHECKLIST
+================================================================================
+
+[ ] Terminal tampil: PS ...\starter-project-with-webpack>
+[ ] Tidak tampil: PS ...\tugas hafidz>
+[ ] Bisa jalankan: npm run build
+[ ] Bisa jalankan: npm run serve
+[ ] Server berjalan di localhost:8080
+
+================================================================================
+
+                    COPY-PASTE INI SAJA:
+
+cd starter-project-with-webpack
+npm run build
+npm run serve
+
+================================================================================
+

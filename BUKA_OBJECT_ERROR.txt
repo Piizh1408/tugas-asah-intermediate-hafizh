@@ -1,0 +1,92 @@
+================================================================================
+              CARA MELIHAT ISI OBJECT ERROR
+================================================================================
+
+Console menampilkan "API Error Response: ► Object"
+
+Ini berarti ada error dari server, tapi perlu dibuka untuk melihat detailnya!
+
+================================================================================
+              CARA MELIHAT ISI ERROR
+================================================================================
+
+DI CONSOLE:
+
+1. Lihat "API Error Response: ► Object"
+2. KLIK tanda ► (panah) untuk expand object
+3. Akan terlihat isi object, misalnya:
+   {
+     error: true,
+     message: "..."
+   }
+
+ATAU:
+
+1. KLIK tanda ► di sebelah "Failed to add story: ► Object"
+2. Akan terlihat error lengkap
+
+================================================================================
+              APA YANG PERLU DICARI
+================================================================================
+
+Saat expand object, cari field "message":
+
+{
+  error: true,
+  message: "..."  ← INI PESAN ERROR LENGKAPNYA!
+}
+
+Contoh pesan error mungkin:
+- "description is required"
+- "invalid photo format"
+- "description too long"
+- dll
+
+================================================================================
+              ALTERNATIF: CHECK NETWORK TAB
+================================================================================
+
+Jika tidak bisa expand object di Console:
+
+1. Buka tab "Network" di DevTools (F12)
+2. Refresh halaman
+3. Submit form lagi
+4. Cari request "POST /v1/stories" di list
+5. KLIK request tersebut
+6. Buka tab "Response" atau "Preview"
+7. Lihat response body dari server
+
+================================================================================
+              CARA SCREENSHOT YANG BENAR
+================================================================================
+
+Kalau mau screenshot untuk report:
+
+1. KLIK tanda ► untuk expand object
+2. Screenshot console dengan object yang sudah terbuka
+3. Pastikan field "message" terlihat jelas
+
+ATAU:
+
+1. Screenshot Network tab
+2. Response/Preview tab
+3. Pesan error lengkap
+
+================================================================================
+              LAPORKAN
+================================================================================
+
+Setelah melihat pesan error lengkap, laporkan:
+
+1. Apa pesan error di field "message"?
+2. Apa yang dikirim di FormData?
+3. Format dan ukuran foto?
+
+Dengan info ini, bisa ketahu penyebab 400!
+
+================================================================================
+
+                    KLIK PANAH ► UNTUK EXPAND OBJECT!
+
+================================================================================
+

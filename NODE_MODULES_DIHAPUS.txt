@@ -1,0 +1,71 @@
+================================================================================
+              ✅ NODE_MODULES SUDAH DIHAPUS
+================================================================================
+
+Folder node_modules sudah dihapus dari starter-project-with-webpack!
+
+FOLDER LAIN TIDAK RUSAK, hanya node_modules yang dihapus.
+
+================================================================================
+              CARA MENGGUNAKAN KEMBALI
+================================================================================
+
+JIKA MAU BUILD/RUN LAGI:
+
+1. Buka terminal di folder starter-project-with-webpack
+2. Jalankan:
+   
+   npm install
+   
+   npm run build
+   
+   npm run serve
+
+================================================================================
+              FILE YANG TIDAK RUSAK
+================================================================================
+
+✅ Semua file source code (src/)
+✅ Semua file konfigurasi (webpack.*.js, package.json)
+✅ Folder dist/ (build hasil sebelumnya)
+✅ Semua dokumentasi (*.txt, *.md)
+✅ Semua file lainnya
+
+Hanya node_modules yang dihapus!
+
+================================================================================
+              VERIFIKASI
+================================================================================
+
+LIHAT FILE:
+
+[√] src/ - masih ada
+[√] dist/ - masih ada
+[√] package.json - masih ada
+[√] webpack.*.js - masih ada
+[√] Semua txt/md - masih ada
+[√] node_modules - sudah dihapus (ini yang dimau!)
+
+================================================================================
+              UNTUK SUBMIT KE DICODING
+================================================================================
+
+Folder node_modules TIDAK perlu di-submit!
+
+Yang perlu di-submit:
+- src/ (source code)
+- dist/ (build hasil)
+- package.json
+- webpack.*.js
+- README.md
+- Dokumentasi lainnya
+
+JANGAN submit:
+- node_modules/ (terlalu besar, bisa reinstall)
+
+================================================================================
+
+                    SELESAI! NODE_MODULES SUDAH DIHAPUS!
+
+================================================================================
+

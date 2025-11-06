@@ -1,0 +1,81 @@
+================================================================================
+                    PANDUAN TESTING - COBA INI
+================================================================================
+
+UNTUK MENGATASI ERROR "lat must be a number":
+
+1. PASTIKAN KLIK PETA DULU
+   - Buka halaman "Tambah Cerita"
+   - Isi judul dan deskripsi
+   - ⚠️ PENTING: KLIK PETA untuk pilih lokasi
+   - Upload foto
+   - Submit
+
+2. CEK CONSOLE (F12)
+   - Buka Developer Tools (F12)
+   - Tab "Console"
+   - Lihat log "FormData contents:"
+   - Pastikan lat dan lon ada nilainya
+
+3. JIKA MASIH ERROR:
+   - Coba refresh halaman (Ctrl+Shift+R)
+   - Pastikan koneksi internet aktif
+   - Coba logout dan login lagi
+   - Buat akun baru jika perlu
+
+================================================================================
+                        ERROR YANG MUNGKIN MUNCUL
+================================================================================
+
+ERROR: "lat must be a number"
+PENYEBAB: Koordinat belum dipilih dari peta
+SOLUSI: Klik peta untuk pilih lokasi
+
+ERROR: "401 Unauthorized"  
+PENYEBAB: Token expired atau belum login
+SOLUSI: Login ulang
+
+ERROR: "400 Bad Request"
+PENYEBAB: Data tidak valid atau email sudah terdaftar
+SOLUSI: Cek data yang dimasukkan
+
+================================================================================
+                        CARA TESTING LENGKAP
+================================================================================
+
+1. DAFTAR AKUN BARU
+   cd starter-project-with-webpack
+   npm run start-dev
+   Buka: http://localhost:8080
+   Klik "Daftar"
+   Isi form dan daftar
+
+2. LOGIN
+   Login dengan akun yang didaftarkan
+   Pastikan masuk ke homepage
+
+3. TAMBAH CERITA
+   Klik "➕ Tambah Cerita"
+   Isi judul (contoh: "Test Story")
+   Isi deskripsi (min 10 karakter)
+   ⚠️ KLIK PETA untuk pilih lokasi
+   Upload foto
+   Klik "Simpan Cerita"
+   Pastikan sukses
+
+================================================================================
+                        JIKA MASIH ERROR
+================================================================================
+
+BUILD ULANG:
+   npm run build
+   npm run serve
+
+CLEAR CACHE BROWSER:
+   Tekan Ctrl+Shift+R untuk hard refresh
+
+CEK INTERNET:
+   Pastikan bisa akses story-api.dicoding.dev
+
+================================================================================
+
