@@ -54,15 +54,18 @@ class App {
     const navLogin = document.getElementById('nav-login');
     const navRegister = document.getElementById('nav-register');
     const navLogout = document.getElementById('nav-logout');
+    const navBookmark = document.getElementById('nav-bookmark');
 
     if (token) {
       if (navLogin) navLogin.style.display = 'none';
       if (navRegister) navRegister.style.display = 'none';
       if (navLogout) navLogout.style.display = 'block';
+      if (navBookmark) navBookmark.style.display = 'block';
     } else {
       if (navLogin) navLogin.style.display = 'block';
       if (navRegister) navRegister.style.display = 'block';
       if (navLogout) navLogout.style.display = 'none';
+      if (navBookmark) navBookmark.style.display = 'none';
     }
   }
 

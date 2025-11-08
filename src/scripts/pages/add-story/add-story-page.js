@@ -1,6 +1,5 @@
 import { addStory } from '../../data/api.js';
 import 'leaflet/dist/leaflet.css';
-import { saveStoryToIndexedDB } from '../../utils/indexeddb.js';
 
 export default class AddStoryPage {
   async render() {
@@ -51,7 +50,7 @@ export default class AddStoryPage {
             </div>
 
             <div class="form-group">
-              <label for="story-lat" class="form-label" style="display: none;">Latitude</label>
+              <label for="story-lat" class="form-label">Latitude</label>
               <input 
                 type="number" 
                 id="story-lat" 
@@ -69,7 +68,7 @@ export default class AddStoryPage {
             </div>
 
             <div class="form-group">
-              <label for="story-lon" class="form-label" style="display: none;">Longitude</label>
+              <label for="story-lon" class="form-label">Longitude</label>
               <input 
                 type="number" 
                 id="story-lon" 
@@ -301,20 +300,6 @@ export default class AddStoryPage {
         const response = await addStory(formData, token);
 
         if (!response.error) {
-          // Save to IndexedDB if story was successfully added
-          // API might return story in response.story or response directly
-          const storyData = response.story || response;
-          
-          if (storyData && (storyData.id || storyData.name)) {
-            try {
-              await saveStoryToIndexedDB(storyData);
-              console.log('Story saved to IndexedDB');
-            } catch (dbError) {
-              console.error('Error saving to IndexedDB:', dbError);
-              // Don't fail the whole operation if IndexedDB fails
-            }
-          }
-          
           successDisplay.textContent = 'Cerita berhasil ditambahkan!';
           successDisplay.style.display = 'block';
           

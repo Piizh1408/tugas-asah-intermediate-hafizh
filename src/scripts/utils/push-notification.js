@@ -17,26 +17,50 @@ function urlBase64ToUint8Array(base64String) {
   return outputArray;
 }
 
-// Get VAPID public key from API
-async function getVapidPublicKey() {
+// Get VAPID public key from config (sesuai dokumentasi Story API)
+function getVapidPublicKey() {
+  // VAPID key sudah tersedia di dokumentasi Story API, gunakan langsung dari config
+  return CONFIG.VAPID_PUBLIC_KEY;
+}
+
+// Verify VAPID key format and validity
+export function verifyVapidKey() {
+  const key = getVapidPublicKey();
+  
+  if (!key) {
+    console.error('❌ VAPID key tidak ditemukan di config');
+    return false;
+  }
+  
+  // Check if key is not placeholder
+  if (key.length > 150) {
+    console.warn('⚠️ VAPID key terlalu panjang, kemungkinan masih placeholder');
+    console.warn('   Format VAPID key yang benar biasanya ~87 karakter (base64url)');
+    return false;
+  }
+  
+  // Check format (base64url: alphanumeric, -, _)
+  const base64urlPattern = /^[A-Za-z0-9_-]+$/;
+  if (!base64urlPattern.test(key)) {
+    console.error('❌ Format VAPID key tidak valid (harus base64url: A-Z, a-z, 0-9, -, _)');
+    return false;
+  }
+  
+  // Try to convert to Uint8Array to verify it's valid
   try {
-    const response = await fetch(`${CONFIG.BASE_URL}/stories/push/vapid-public-key`);
-    if (!response.ok) {
-      // If endpoint not available, return null (will be handled gracefully)
-      if (response.status === 404) {
-        console.warn('VAPID public key endpoint not available (404). This is OK for testing via DevTools.');
-        return null;
-      }
-      throw new Error(`Failed to get VAPID public key: ${response.status}`);
+    const testArray = urlBase64ToUint8Array(key);
+    if (testArray.length === 0 || testArray.length !== 65) {
+      console.warn('⚠️ VAPID key length tidak sesuai (harus menghasilkan 65 bytes)');
+      return false;
     }
-    const data = await response.json();
-    // Handle different possible response structures
-    return data.vapidPublicKey || data.publicKey || data.key;
+    console.log('✅ VAPID key format valid');
+    console.log(`   Key length: ${key.length} karakter`);
+    console.log(`   Converted to: ${testArray.length} bytes`);
+    return true;
   } catch (error) {
-    console.error('Error getting VAPID public key:', error);
-    // Return null instead of throwing - allows testing via DevTools
-    console.warn('Push notification can still be tested via DevTools > Application > Service Workers > Push');
-    return null;
+    console.error('❌ Error converting VAPID key:', error.message);
+    console.error('   Pastikan key adalah format base64url yang valid');
+    return false;
   }
 }
 
@@ -58,34 +82,21 @@ export async function subscribeToPushNotifications() {
     // Register service worker
     const registration = await navigator.serviceWorker.ready;
 
-    // Get VAPID public key
-    const vapidPublicKey = await getVapidPublicKey();
+    // Get VAPID public key dari config (sesuai dokumentasi Story API)
+    const vapidPublicKey = getVapidPublicKey();
     
-    let subscription;
-    
-    // If VAPID key not available, try to subscribe without it (for testing)
     if (!vapidPublicKey) {
-      console.warn('VAPID key not available. Attempting subscription without key (for testing via DevTools).');
-      try {
-        // Try to subscribe without applicationServerKey (some browsers allow this for testing)
-        subscription = await registration.pushManager.subscribe({
-          userVisibleOnly: true,
-        });
-      } catch (noKeyError) {
-        console.warn('Could not subscribe without VAPID key:', noKeyError.message);
-        console.warn('Push notification can still be tested via DevTools > Application > Service Workers > Push');
-        // Return null - user can still test via DevTools
-        return null;
-      }
-    } else {
-      const applicationServerKey = urlBase64ToUint8Array(vapidPublicKey);
-      
-      // Subscribe to push with VAPID key
-      subscription = await registration.pushManager.subscribe({
-        userVisibleOnly: true,
-        applicationServerKey: applicationServerKey,
-      });
+      throw new Error('VAPID public key tidak ditemukan di config');
     }
+    
+    // Convert VAPID key dan subscribe
+    const applicationServerKey = urlBase64ToUint8Array(vapidPublicKey);
+    
+    // Subscribe to push dengan VAPID key dari dokumentasi Story API
+    const subscription = await registration.pushManager.subscribe({
+      userVisibleOnly: true,
+      applicationServerKey: applicationServerKey,
+    });
 
     // Send subscription to server
     const token = localStorage.getItem('authToken');
@@ -164,6 +175,9 @@ export async function initializePushNotifications() {
   if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
     return;
   }
+
+  // Verify VAPID key on initialization
+  verifyVapidKey();
 
   // Check if already subscribed
   const isSubscribed = await isSubscribedToPushNotifications();

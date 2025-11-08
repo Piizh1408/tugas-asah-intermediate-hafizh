@@ -1,9 +1,9 @@
 import { getStories } from '../../data/api.js';
 import 'leaflet/dist/leaflet.css';
 import {
-  saveStoryToIndexedDB,
-  getAllStoriesFromIndexedDB,
-  deleteStoryFromIndexedDB,
+  addBookmark,
+  removeBookmark,
+  isBookmarked,
 } from '../../utils/indexeddb.js';
 import {
   subscribeToPushNotifications,
@@ -36,6 +36,9 @@ export default class HomePage {
             <div class="stories-header">
               <h2>Daftar Cerita</h2>
               <div class="header-actions">
+                <a href="#/bookmark" class="btn btn-secondary" aria-label="Lihat bookmark">
+                  🔖 Bookmark Saya
+                </a>
                 <button id="push-notification-btn" class="btn btn-secondary" aria-label="Aktifkan notifikasi push">
                   🔔 Aktifkan Notifikasi
                 </button>
@@ -43,9 +46,6 @@ export default class HomePage {
                   ➕ Tambah Cerita
                 </button>
               </div>
-            </div>
-            <div id="offline-indicator" class="offline-indicator" style="display: none;">
-              <span>📴 Mode Offline - Menampilkan data dari IndexedDB</span>
             </div>
             <div id="stories-list" class="stories-list" role="list"></div>
             <div id="stories-loading" class="loading-state" style="display: none;">
@@ -104,7 +104,7 @@ export default class HomePage {
     // Filter buttons
     const filterBtns = document.querySelectorAll('.filter-btn');
     filterBtns.forEach(btn => {
-      btn.addEventListener('click', () => {
+      btn.addEventListener('click', async () => {
         filterBtns.forEach(b => {
           b.classList.remove('active');
           b.setAttribute('aria-pressed', 'false');
@@ -113,7 +113,7 @@ export default class HomePage {
         btn.setAttribute('aria-pressed', 'true');
         
         this.currentFilter = btn.id.replace('filter-', '');
-        this._filterAndDisplayStories(this.allStories, this.currentFilter);
+        await this._filterAndDisplayStories(this.allStories, this.currentFilter);
       });
     });
 
@@ -124,65 +124,29 @@ export default class HomePage {
   async _loadStories(token) {
     const loadingState = document.getElementById('stories-loading');
     const storiesList = document.getElementById('stories-list');
-    const offlineIndicator = document.getElementById('offline-indicator');
     
     loadingState.style.display = 'block';
     storiesList.innerHTML = '';
-    offlineIndicator.style.display = 'none';
 
     try {
-      // Try to fetch from API first
+      // Fetch stories from API
       const response = await getStories(token);
       
       if (!response.error && response.listStory) {
         this.allStories = response.listStory;
-        
-        // Save all stories to IndexedDB
-        for (const story of this.allStories) {
-          try {
-            await saveStoryToIndexedDB(story);
-          } catch (error) {
-            console.error('Error saving story to IndexedDB:', error);
-          }
-        }
-        
         this._filterAndDisplayStories(this.allStories, 'all');
-        offlineIndicator.style.display = 'none';
       } else {
-        // If API fails, try loading from IndexedDB
-        await this._loadStoriesFromIndexedDB();
+        storiesList.innerHTML = '<p class="empty-state">Tidak ada cerita tersedia.</p>';
       }
     } catch (error) {
       console.error('Error loading stories from API:', error);
-      // Load from IndexedDB as fallback
-      await this._loadStoriesFromIndexedDB();
+      storiesList.innerHTML = '<p class="error-state">Gagal memuat cerita. Silakan coba lagi.</p>';
     } finally {
       loadingState.style.display = 'none';
     }
   }
 
-  async _loadStoriesFromIndexedDB() {
-    const storiesList = document.getElementById('stories-list');
-    const offlineIndicator = document.getElementById('offline-indicator');
-    
-    try {
-      const stories = await getAllStoriesFromIndexedDB();
-      if (stories && stories.length > 0) {
-        this.allStories = stories;
-        this._filterAndDisplayStories(this.allStories, 'all');
-        offlineIndicator.style.display = 'block';
-      } else {
-        storiesList.innerHTML = '<p class="empty-state">Tidak ada cerita tersedia. Periksa koneksi internet Anda.</p>';
-        offlineIndicator.style.display = 'none';
-      }
-    } catch (error) {
-      console.error('Error loading stories from IndexedDB:', error);
-      storiesList.innerHTML = '<p class="error-state">Gagal memuat cerita. Silakan coba lagi.</p>';
-      offlineIndicator.style.display = 'none';
-    }
-  }
-
-  _filterAndDisplayStories(stories, filter) {
+  async _filterAndDisplayStories(stories, filter) {
     // Clear existing markers
     this.markers.forEach(marker => this.map.removeLayer(marker));
     this.markers = [];
@@ -201,7 +165,14 @@ export default class HomePage {
     if (filteredStories.length === 0) {
       storiesList.innerHTML = '<p class="empty-state">Tidak ada cerita untuk filter ini</p>';
     } else {
-      storiesList.innerHTML = filteredStories.map(story => `
+      // Check bookmark status for all stories
+      const bookmarkStatuses = await Promise.all(
+        filteredStories.map(story => isBookmarked(story.id))
+      );
+
+      storiesList.innerHTML = filteredStories.map((story, index) => {
+        const bookmarked = bookmarkStatuses[index];
+        return `
         <article class="story-card" role="listitem" data-story-id="${story.id}">
           <div class="story-header">
             <img 
@@ -224,44 +195,64 @@ export default class HomePage {
           </div>
           <div class="story-actions">
             <button 
-              class="btn-delete-story" 
+              class="btn-bookmark ${bookmarked ? 'bookmarked' : ''}" 
               data-story-id="${story.id}"
-              aria-label="Hapus cerita ${story.name || 'ini'}"
-              title="Hapus dari IndexedDB"
+              aria-label="${bookmarked ? 'Hapus bookmark' : 'Tambah bookmark'} ${story.name || 'ini'}"
+              title="${bookmarked ? 'Hapus dari bookmark' : 'Tambah ke bookmark'}"
             >
-              🗑️ Hapus
+              ${bookmarked ? '🔖 Hapus Bookmark' : '🔖 Bookmark'}
             </button>
           </div>
         </article>
-      `).join('');
+      `;
+      }).join('');
 
-      // Add delete button event listeners
-      const deleteButtons = document.querySelectorAll('.btn-delete-story');
-      deleteButtons.forEach(button => {
+      // Add bookmark button event listeners
+      const bookmarkButtons = document.querySelectorAll('.btn-bookmark');
+      bookmarkButtons.forEach(button => {
         button.addEventListener('click', async (e) => {
           const storyId = e.target.getAttribute('data-story-id');
-          if (storyId && confirm('Apakah Anda yakin ingin menghapus cerita ini dari IndexedDB?')) {
-            try {
-              await deleteStoryFromIndexedDB(storyId);
-              // Remove from current display
-              this.allStories = this.allStories.filter(s => s.id !== storyId);
-              this._filterAndDisplayStories(this.allStories, this.currentFilter);
+          const story = filteredStories.find(s => s.id === storyId);
+          
+          if (!story) return;
+
+          try {
+            const currentlyBookmarked = await isBookmarked(storyId);
+            
+            if (currentlyBookmarked) {
+              // Remove bookmark
+              await removeBookmark(storyId);
+              button.textContent = '🔖 Bookmark';
+              button.classList.remove('bookmarked');
+              button.setAttribute('aria-label', `Tambah bookmark ${story.name || 'ini'}`);
+              button.setAttribute('title', 'Tambah ke bookmark');
               
               // Show success message
-              const storiesList = document.getElementById('stories-list');
               const successMsg = document.createElement('div');
               successMsg.className = 'success-message';
-              successMsg.textContent = 'Cerita berhasil dihapus dari IndexedDB';
+              successMsg.textContent = 'Bookmark dihapus';
               successMsg.style.display = 'block';
               storiesList.insertBefore(successMsg, storiesList.firstChild);
+              setTimeout(() => successMsg.remove(), 3000);
+            } else {
+              // Add bookmark
+              await addBookmark(story);
+              button.textContent = '🔖 Hapus Bookmark';
+              button.classList.add('bookmarked');
+              button.setAttribute('aria-label', `Hapus bookmark ${story.name || 'ini'}`);
+              button.setAttribute('title', 'Hapus dari bookmark');
               
-              setTimeout(() => {
-                successMsg.remove();
-              }, 3000);
-            } catch (error) {
-              console.error('Error deleting story:', error);
-              alert('Gagal menghapus cerita. Silakan coba lagi.');
+              // Show success message
+              const successMsg = document.createElement('div');
+              successMsg.className = 'success-message';
+              successMsg.textContent = 'Bookmark ditambahkan';
+              successMsg.style.display = 'block';
+              storiesList.insertBefore(successMsg, storiesList.firstChild);
+              setTimeout(() => successMsg.remove(), 3000);
             }
+          } catch (error) {
+            console.error('Error toggling bookmark:', error);
+            alert('Gagal mengubah bookmark. Silakan coba lagi.');
           }
         });
       });
