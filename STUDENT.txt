@@ -1,4 +1,4 @@
-APP_URL=https://piizh1408.github.io/Tugas-asah-hafizh/
+APP_URL=https://piizh1408.github.io/tugas-asah-intermediate-hafizh/
 MAP_SERVICE_API_KEY=Not_Required (Using OpenStreetMap)
 
 Student Information:
