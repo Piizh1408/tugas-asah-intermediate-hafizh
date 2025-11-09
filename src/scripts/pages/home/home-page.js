@@ -4,6 +4,9 @@ import {
   addBookmark,
   removeBookmark,
   isBookmarked,
+  saveStory,
+  deleteStory,
+  getAllStories,
 } from '../../utils/indexeddb.js';
 import {
   subscribeToPushNotifications,
@@ -202,6 +205,22 @@ export default class HomePage {
             >
               ${bookmarked ? '🔖 Hapus Bookmark' : '🔖 Bookmark'}
             </button>
+            <button 
+              class="btn-save-story" 
+              data-story-id="${story.id}"
+              aria-label="Simpan cerita ke IndexedDB ${story.name || 'ini'}"
+              title="Simpan cerita ke IndexedDB"
+            >
+              💾 Simpan Cerita
+            </button>
+            <button 
+              class="btn-delete-story" 
+              data-story-id="${story.id}"
+              aria-label="Hapus cerita dari IndexedDB ${story.name || 'ini'}"
+              title="Hapus cerita dari IndexedDB"
+            >
+              🗑️ Hapus Cerita
+            </button>
           </div>
         </article>
       `;
@@ -253,6 +272,60 @@ export default class HomePage {
           } catch (error) {
             console.error('Error toggling bookmark:', error);
             alert('Gagal mengubah bookmark. Silakan coba lagi.');
+          }
+        });
+      });
+
+      // Add save story button event listeners
+      const saveStoryButtons = document.querySelectorAll('.btn-save-story');
+      saveStoryButtons.forEach(button => {
+        button.addEventListener('click', async (e) => {
+          const storyId = e.target.getAttribute('data-story-id');
+          const story = filteredStories.find(s => s.id === storyId);
+          
+          if (!story) return;
+
+          try {
+            await saveStory(story);
+            
+            // Show success message
+            const successMsg = document.createElement('div');
+            successMsg.className = 'success-message';
+            successMsg.textContent = 'Cerita berhasil disimpan ke IndexedDB';
+            successMsg.style.display = 'block';
+            storiesList.insertBefore(successMsg, storiesList.firstChild);
+            setTimeout(() => successMsg.remove(), 3000);
+          } catch (error) {
+            console.error('Error saving story:', error);
+            alert('Gagal menyimpan cerita. Silakan coba lagi.');
+          }
+        });
+      });
+
+      // Add delete story button event listeners
+      const deleteStoryButtons = document.querySelectorAll('.btn-delete-story');
+      deleteStoryButtons.forEach(button => {
+        button.addEventListener('click', async (e) => {
+          const storyId = e.target.getAttribute('data-story-id');
+          const story = filteredStories.find(s => s.id === storyId);
+          
+          if (!story) return;
+
+          if (confirm(`Apakah Anda yakin ingin menghapus cerita "${story.name || 'ini'}" dari IndexedDB?`)) {
+            try {
+              await deleteStory(storyId);
+              
+              // Show success message
+              const successMsg = document.createElement('div');
+              successMsg.className = 'success-message';
+              successMsg.textContent = 'Cerita berhasil dihapus dari IndexedDB';
+              successMsg.style.display = 'block';
+              storiesList.insertBefore(successMsg, storiesList.firstChild);
+              setTimeout(() => successMsg.remove(), 3000);
+            } catch (error) {
+              console.error('Error deleting story:', error);
+              alert('Gagal menghapus cerita. Silakan coba lagi.');
+            }
           }
         });
       });
