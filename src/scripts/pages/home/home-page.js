@@ -426,55 +426,78 @@ export default class HomePage {
       return;
     }
     
-    // Check if we're on file:// protocol
-    if (window.location.protocol === 'file:') {
+    // Check if we're on HTTPS or localhost (required for push notification)
+    if (window.location.protocol !== 'https:' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
       button.disabled = true;
-      button.textContent = '🔔 Perlu HTTP Server';
-      button.title = 'Aplikasi harus di-serve via http://localhost. Jalankan: npm run serve';
+      button.textContent = '🔔 Perlu HTTPS';
+      button.title = 'Push notification hanya bekerja di HTTPS atau localhost';
       return;
     }
 
-    // Wait for service worker to be ready
+    // Wait for service worker to be ready dengan timeout lebih lama
     try {
-      // Wait up to 5 seconds for service worker to be ready
-      let registration = null;
-      let attempts = 0;
-      const maxAttempts = 10;
+      console.log('⏳ Waiting for service worker to be ready...');
       
-      while (!registration && attempts < maxAttempts) {
+      // Check if service worker is already registered
+      const registrations = await navigator.serviceWorker.getRegistrations();
+      console.log('📋 Service Worker registrations:', registrations.length);
+      
+      if (registrations.length === 0) {
+        console.warn('⚠️ No service worker registered yet. Waiting for registration...');
+        button.textContent = '🔔 Menunggu Service Worker...';
+        button.title = 'Service worker sedang didaftarkan, tunggu beberapa detik dan refresh halaman';
+        // Don't disable button, let user try again later
+        return;
+      }
+
+      // Wait for service worker to be ready dengan timeout 15 detik
+      let registration = null;
+      const maxWaitTime = 15000; // 15 seconds
+      const startTime = Date.now();
+      
+      while (!registration && (Date.now() - startTime) < maxWaitTime) {
         try {
           registration = await navigator.serviceWorker.ready;
-          break;
+          if (registration) {
+            console.log('✅ Service Worker ready:', registration.scope);
+            break;
+          }
         } catch (e) {
-          attempts++;
+          // Service worker belum ready, tunggu sebentar
           await new Promise(resolve => setTimeout(resolve, 500));
         }
       }
 
       if (!registration) {
-        button.disabled = true;
-        button.textContent = '🔔 Menunggu Service Worker...';
-        button.title = 'Service worker sedang dimuat, silakan refresh halaman';
+        console.error('❌ Service Worker tidak ready setelah menunggu');
+        button.textContent = '🔔 Service Worker Belum Siap';
+        button.title = 'Service worker belum siap. Pastikan service worker sudah ter-register. Refresh halaman dan coba lagi.';
+        // Don't disable, let user try
         return;
       }
 
+      console.log('✅ Service Worker ready, checking subscription status...');
+
       // Check current subscription status
       const isSubscribed = await isSubscribedToPushNotifications();
+      console.log('📊 Subscription status:', isSubscribed);
       
       if (isSubscribed) {
         button.textContent = '🔔 Matikan Notifikasi';
         button.classList.remove('btn-secondary');
         button.classList.add('btn-success');
+        button.title = 'Notifikasi push aktif. Klik untuk menonaktifkan.';
       } else {
         button.textContent = '🔔 Aktifkan Notifikasi';
         button.classList.remove('btn-success');
         button.classList.add('btn-secondary');
+        button.title = 'Klik untuk mengaktifkan notifikasi push';
       }
     } catch (error) {
-      console.error('Error setting up push notification button:', error);
-      button.disabled = true;
+      console.error('❌ Error setting up push notification button:', error);
       button.textContent = '🔔 Error Setup';
-      button.title = 'Terjadi error saat setup: ' + error.message;
+      button.title = 'Terjadi error saat setup: ' + error.message + '. Refresh halaman dan coba lagi.';
+      // Don't disable button, let user try again
     }
 
     // Add click handler - hanya sekali, hapus listener lama jika ada
