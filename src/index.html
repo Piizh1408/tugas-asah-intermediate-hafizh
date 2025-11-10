@@ -6,7 +6,7 @@
     <meta name="description" content="StoryMap - Platform berbagi cerita perjalanan dengan peta interaktif">
     <meta name="theme-color" content="#4A90E2" />
     <link rel="shortcut icon" href="favicon.png">
-    <link rel="manifest" href="manifest.json">
+    <link rel="manifest" href="manifest.json" id="manifest-link">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -14,6 +14,17 @@
     <link rel="apple-touch-icon" href="images/logo.png">
 
     <title>StoryMap - Cerita Perjalanan Bersama</title>
+    <script>
+      // Fix manifest path untuk GitHub Pages subfolder
+      (function() {
+        const path = window.location.pathname;
+        const basePath = path.endsWith('/') ? path : path.substring(0, path.lastIndexOf('/') + 1);
+        const manifestLink = document.getElementById('manifest-link');
+        if (manifestLink && basePath !== '/') {
+          manifestLink.href = basePath + 'manifest.json';
+        }
+      })();
+    </script>
   </head>
   <body>
     <a href="#main-content" class="skip-to-content">Lewati ke konten utama</a>

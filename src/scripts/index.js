@@ -9,16 +9,33 @@ if ('serviceWorker' in navigator) {
   // Register immediately when page loads
   window.addEventListener('load', async () => {
     try {
-      // Gunakan relative path untuk GitHub Pages subfolder
-      const swPath = './sw.js';
+      // Get base path untuk GitHub Pages subfolder
+      // Contoh: https://piizh1408.github.io/tugas-asah-intermediate-hafizh/
+      // Base path akan menjadi: /tugas-asah-intermediate-hafizh/
+      const getBasePath = () => {
+        const path = window.location.pathname;
+        // Jika path adalah root atau index.html, ambil path sampai sebelum filename
+        if (path === '/' || path.endsWith('/index.html') || path.endsWith('/')) {
+          return path.endsWith('/') ? path : path.substring(0, path.lastIndexOf('/') + 1);
+        }
+        // Jika ada path lain, ambil base path
+        return path.substring(0, path.lastIndexOf('/') + 1);
+      };
+      
+      const basePath = getBasePath();
+      const swPath = basePath + 'sw.js';
+      const swScope = basePath;
+      
+      console.log('Registering Service Worker:', swPath, 'with scope:', swScope);
+      
       const registration = await navigator.serviceWorker.register(swPath, {
-        scope: './'
+        scope: swScope
       });
-      console.log('Service Worker registered successfully:', registration.scope);
+      console.log('✅ Service Worker registered successfully:', registration.scope);
       
       // Wait for service worker to be ready
       await navigator.serviceWorker.ready;
-      console.log('Service Worker ready!');
+      console.log('✅ Service Worker ready!');
       
       // Check for updates
       registration.addEventListener('updatefound', () => {
@@ -30,17 +47,8 @@ if ('serviceWorker' in navigator) {
         });
       });
     } catch (error) {
-      console.error('Service Worker registration failed:', error);
+      console.error('❌ Service Worker registration failed:', error);
       console.error('Error details:', error.message);
-      // Try alternative path (absolute)
-      try {
-        const altRegistration = await navigator.serviceWorker.register('/sw.js', {
-          scope: '/'
-        });
-        console.log('Service Worker registered with absolute path');
-      } catch (altError) {
-        console.error('Alternative registration also failed:', altError);
-      }
     }
   });
 
