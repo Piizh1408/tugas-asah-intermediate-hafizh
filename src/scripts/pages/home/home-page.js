@@ -477,33 +477,93 @@ export default class HomePage {
       button.title = 'Terjadi error saat setup: ' + error.message;
     }
 
-    // Add click handler
-    button.addEventListener('click', async () => {
-      const currentStatus = await isSubscribedToPushNotifications();
+    // Add click handler - hanya sekali, hapus listener lama jika ada
+    // Clone button untuk menghapus semua event listener lama
+    const oldButton = button;
+    const newButton = oldButton.cloneNode(true);
+    oldButton.parentNode.replaceChild(newButton, oldButton);
+    
+    // Enable button setelah clone
+    newButton.disabled = false;
+    
+    newButton.addEventListener('click', async (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      
+      // Disable button saat processing
+      newButton.disabled = true;
+      newButton.textContent = '🔔 Memproses...';
       
       try {
+        const currentStatus = await isSubscribedToPushNotifications();
+        
         if (currentStatus) {
           // Unsubscribe
-          await unsubscribeFromPushNotifications();
-          button.textContent = '🔔 Aktifkan Notifikasi';
-          button.classList.remove('btn-success');
-          button.classList.add('btn-secondary');
-          alert('Notifikasi push telah dinonaktifkan');
+          try {
+            await unsubscribeFromPushNotifications();
+            newButton.textContent = '🔔 Aktifkan Notifikasi';
+            newButton.classList.remove('btn-success');
+            newButton.classList.add('btn-secondary');
+            
+            // Show success message
+            const successMsg = document.createElement('div');
+            successMsg.className = 'success-message';
+            successMsg.textContent = 'Notifikasi push telah dinonaktifkan';
+            successMsg.style.display = 'block';
+            document.getElementById('stories-list').insertBefore(successMsg, document.getElementById('stories-list').firstChild);
+            setTimeout(() => successMsg.remove(), 3000);
+          } catch (unsubError) {
+            console.error('Error unsubscribing:', unsubError);
+            alert('Gagal menonaktifkan notifikasi. Silakan coba lagi.');
+          }
         } else {
           // Subscribe
-          const subscription = await subscribeToPushNotifications();
-          if (subscription) {
-            button.textContent = '🔔 Matikan Notifikasi';
-            button.classList.remove('btn-secondary');
-            button.classList.add('btn-success');
-            alert('Notifikasi push telah diaktifkan!');
-          } else {
-            alert('Gagal mengaktifkan notifikasi push. Pastikan Anda memberikan izin.');
+          try {
+            const subscription = await subscribeToPushNotifications();
+            if (subscription) {
+              newButton.textContent = '🔔 Matikan Notifikasi';
+              newButton.classList.remove('btn-secondary');
+              newButton.classList.add('btn-success');
+              
+              // Show success message
+              const successMsg = document.createElement('div');
+              successMsg.className = 'success-message';
+              successMsg.textContent = 'Notifikasi push telah diaktifkan! Anda bisa test via DevTools > Application > Service Workers > Push';
+              successMsg.style.display = 'block';
+              document.getElementById('stories-list').insertBefore(successMsg, document.getElementById('stories-list').firstChild);
+              setTimeout(() => successMsg.remove(), 5000);
+            } else {
+              alert('Gagal mengaktifkan notifikasi push. Pastikan Anda memberikan izin notifikasi.');
+            }
+          } catch (subError) {
+            console.error('Error subscribing:', subError);
+            alert('Gagal mengaktifkan notifikasi push: ' + subError.message);
           }
         }
       } catch (error) {
         console.error('Error toggling push notification:', error);
-        alert('Terjadi kesalahan saat mengatur notifikasi push');
+        alert('Terjadi kesalahan saat mengatur notifikasi push: ' + error.message);
+      } finally {
+        // Re-enable button
+        newButton.disabled = false;
+        
+        // Update button text based on current status
+        setTimeout(async () => {
+          try {
+            const status = await isSubscribedToPushNotifications();
+            if (status) {
+              newButton.textContent = '🔔 Matikan Notifikasi';
+              newButton.classList.remove('btn-secondary');
+              newButton.classList.add('btn-success');
+            } else {
+              newButton.textContent = '🔔 Aktifkan Notifikasi';
+              newButton.classList.remove('btn-success');
+              newButton.classList.add('btn-secondary');
+            }
+          } catch (e) {
+            console.error('Error updating button status:', e);
+          }
+        }, 500);
       }
     });
   }

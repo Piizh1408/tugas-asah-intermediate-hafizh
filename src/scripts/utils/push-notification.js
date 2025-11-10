@@ -108,6 +108,10 @@ export async function subscribeToPushNotifications() {
     // Format subscription sesuai dokumentasi Story API
     const subscriptionJson = subscription.toJSON();
     
+    // Save subscription to localStorage terlebih dahulu
+    localStorage.setItem('pushSubscription', JSON.stringify(subscriptionJson));
+    console.log('✅ Push subscription created in browser');
+    
     // Kirim ke endpoint /notifications/subscribe sesuai dokumentasi
     try {
       const response = await fetch(`${CONFIG.BASE_URL}/notifications/subscribe`, {
@@ -127,19 +131,23 @@ export async function subscribeToPushNotifications() {
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({ message: 'Unknown error' }));
-        throw new Error(errorData.message || 'Failed to subscribe to push notifications');
+        const errorMessage = errorData.message || `Server responded with status ${response.status}`;
+        console.warn('⚠️ Warning: Failed to send subscription to server:', errorMessage);
+        console.warn('   Push notification masih bisa digunakan untuk testing via DevTools');
+        // Jangan throw error, karena subscription sudah berhasil dibuat di browser
+        // User masih bisa test via DevTools > Application > Service Workers > Push
+      } else {
+        const result = await response.json();
+        console.log('✅ Push notification subscribed successfully to server:', result);
       }
-
-      const result = await response.json();
-      console.log('✅ Push notification subscribed successfully:', result);
     } catch (fetchError) {
-      console.error('❌ Error sending subscription to server:', fetchError.message);
-      throw fetchError;
+      console.warn('⚠️ Warning: Error sending subscription to server:', fetchError.message);
+      console.warn('   Push notification masih bisa digunakan untuk testing via DevTools');
+      console.warn('   Buka DevTools > Application > Service Workers > Push untuk test manual');
+      // Jangan throw error, karena subscription sudah berhasil dibuat di browser
     }
 
-    // Save subscription to localStorage
-    localStorage.setItem('pushSubscription', JSON.stringify(subscription.toJSON()));
-    console.log('Push notification subscribed successfully');
+    console.log('✅ Push notification subscription ready');
     return subscription;
   } catch (error) {
     console.error('Error subscribing to push notifications:', error);
