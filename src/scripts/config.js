@@ -29,7 +29,7 @@ const CONFIG = {
   // verifyVapidKey();
   // 
   // ========================================
-  VAPID_PUBLIC_KEY: 'BLZQvudO5fk3nhUc9s-0U_M6eO_wdbYVilTrZB7xpNnb8wTDSvVa9gKr_0Edl9BNbBRlkEx-2dj8AD93y4zwc_Y',
+  VAPID_PUBLIC_KEY: 'BLZByudG5fk3hHUc9s-BG_M6d_wD0VViLTrZB7s9hM0oTDSVqdgKr_8Ed130R0BRLkE-2dJ8A093y4zw_Y',
 };
 
 export default CONFIG;
