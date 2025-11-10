@@ -98,38 +98,43 @@ export async function subscribeToPushNotifications() {
       applicationServerKey: applicationServerKey,
     });
 
-    // Send subscription to server
+    // Send subscription to server menggunakan endpoint sesuai dokumentasi Story API
     const token = localStorage.getItem('authToken');
     if (!token) {
       console.warn('No auth token found');
       return null;
     }
 
-    // Try to send subscription to server (optional - for testing via DevTools if endpoint not available)
+    // Format subscription sesuai dokumentasi Story API
+    const subscriptionJson = subscription.toJSON();
+    
+    // Kirim ke endpoint /notifications/subscribe sesuai dokumentasi
     try {
-      const response = await fetch(`${CONFIG.BASE_URL}/stories/push/subscribe`, {
+      const response = await fetch(`${CONFIG.BASE_URL}/notifications/subscribe`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`,
         },
         body: JSON.stringify({
-          subscription: subscription.toJSON(),
+          endpoint: subscriptionJson.endpoint,
+          keys: {
+            p256dh: subscriptionJson.keys.p256dh,
+            auth: subscriptionJson.keys.auth,
+          },
         }),
       });
 
       if (!response.ok) {
-        // If endpoint not available, that's OK - can still test via DevTools
-        if (response.status === 404) {
-          console.warn('Subscribe endpoint not available (404). Push notification can be tested via DevTools.');
-        } else {
-          throw new Error('Failed to subscribe to push notifications');
-        }
+        const errorData = await response.json().catch(() => ({ message: 'Unknown error' }));
+        throw new Error(errorData.message || 'Failed to subscribe to push notifications');
       }
+
+      const result = await response.json();
+      console.log('✅ Push notification subscribed successfully:', result);
     } catch (fetchError) {
-      // If fetch fails (network error, CORS, etc), that's OK for testing
-      console.warn('Could not send subscription to server:', fetchError.message);
-      console.warn('Push notification can still be tested via DevTools > Application > Service Workers > Push');
+      console.error('❌ Error sending subscription to server:', fetchError.message);
+      throw fetchError;
     }
 
     // Save subscription to localStorage
@@ -149,12 +154,42 @@ export async function unsubscribeFromPushNotifications() {
     const subscription = await registration.pushManager.getSubscription();
 
     if (subscription) {
+      const subscriptionJson = subscription.toJSON();
+      const token = localStorage.getItem('authToken');
+      
+      // Unsubscribe dari server menggunakan endpoint DELETE sesuai dokumentasi
+      if (token && subscriptionJson.endpoint) {
+        try {
+          const response = await fetch(`${CONFIG.BASE_URL}/notifications/subscribe`, {
+            method: 'DELETE',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`,
+            },
+            body: JSON.stringify({
+              endpoint: subscriptionJson.endpoint,
+            }),
+          });
+
+          if (!response.ok) {
+            console.warn('Failed to unsubscribe from server, but continuing with local unsubscribe');
+          } else {
+            const result = await response.json();
+            console.log('✅ Unsubscribed from server:', result);
+          }
+        } catch (fetchError) {
+          console.warn('Could not send unsubscribe to server:', fetchError.message);
+        }
+      }
+      
+      // Unsubscribe dari browser
       await subscription.unsubscribe();
       localStorage.removeItem('pushSubscription');
-      console.log('Push notification unsubscribed successfully');
+      console.log('✅ Push notification unsubscribed successfully');
     }
   } catch (error) {
     console.error('Error unsubscribing from push notifications:', error);
+    throw error;
   }
 }
 

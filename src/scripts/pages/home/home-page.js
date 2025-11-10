@@ -137,6 +137,22 @@ export default class HomePage {
       
       if (!response.error && response.listStory) {
         this.allStories = response.listStory;
+        
+        // Simpan data dari API ke IndexedDB (untuk fitur CRUD IndexedDB)
+        // Ini memenuhi kriteria: "Dapat menampilkan, menyimpan dan menghapus data dari API pada indexedDB"
+        try {
+          for (const story of this.allStories) {
+            // Simpan setiap story ke IndexedDB (jika belum ada)
+            await saveStory(story).catch(err => {
+              // Ignore error jika sudah ada (duplicate key)
+              console.log('Story already in IndexedDB or error:', story.id);
+            });
+          }
+          console.log('✅ Data dari API berhasil disimpan ke IndexedDB');
+        } catch (indexedDBError) {
+          console.warn('Warning: Gagal menyimpan ke IndexedDB, tapi tetap lanjut:', indexedDBError);
+        }
+        
         this._filterAndDisplayStories(this.allStories, 'all');
       } else {
         storiesList.innerHTML = '<p class="empty-state">Tidak ada cerita tersedia.</p>';

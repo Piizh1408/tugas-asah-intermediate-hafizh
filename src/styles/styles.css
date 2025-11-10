@@ -564,6 +564,39 @@ header {
   margin-top: 0.5rem;
   padding-top: 0.5rem;
   border-top: 1px solid var(--border-color);
+  flex-wrap: wrap;
+}
+
+/* IndexedDB Buttons - Pastikan terlihat jelas */
+.btn-save-story {
+  padding: 0.5rem 1rem;
+  background-color: var(--success-color);
+  color: white;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  box-shadow: var(--shadow-sm);
+}
+
+.btn-save-story:hover {
+  background-color: #059669;
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+.btn-save-story:focus {
+  outline: 2px solid var(--success-color);
+  outline-offset: 2px;
+}
+
+.btn-save-story:active {
+  transform: translateY(0);
 }
 
 .btn-delete-story {
@@ -573,17 +606,19 @@ header {
   border: none;
   border-radius: var(--radius-sm);
   font-size: 0.875rem;
+  font-weight: 600;
   cursor: pointer;
   transition: var(--transition);
   display: inline-flex;
   align-items: center;
   gap: 0.25rem;
+  box-shadow: var(--shadow-sm);
 }
 
 .btn-delete-story:hover {
   background-color: #dc2626;
   transform: translateY(-1px);
-  box-shadow: var(--shadow-sm);
+  box-shadow: var(--shadow-md);
 }
 
 .btn-delete-story:focus {
@@ -592,6 +627,45 @@ header {
 }
 
 .btn-delete-story:active {
+  transform: translateY(0);
+}
+
+.btn-bookmark {
+  padding: 0.5rem 1rem;
+  background-color: var(--secondary-color);
+  color: white;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  box-shadow: var(--shadow-sm);
+}
+
+.btn-bookmark:hover {
+  background-color: #4b5563;
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+.btn-bookmark.bookmarked {
+  background-color: var(--primary-color);
+}
+
+.btn-bookmark.bookmarked:hover {
+  background-color: var(--primary-hover);
+}
+
+.btn-bookmark:focus {
+  outline: 2px solid var(--secondary-color);
+  outline-offset: 2px;
+}
+
+.btn-bookmark:active {
   transform: translateY(0);
 }
 
