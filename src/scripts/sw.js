@@ -1,12 +1,21 @@
 // Service Worker untuk PWA - Offline Support dan Push Notifications
 const CACHE_NAME = 'storymap-v1';
+
+// Get base path from service worker location (untuk GitHub Pages subfolder)
+const getBasePath = () => {
+  const swLocation = self.location.pathname;
+  const swPath = swLocation.substring(0, swLocation.lastIndexOf('/') + 1);
+  return swPath;
+};
+
+const basePath = getBasePath();
 const urlsToCache = [
-  '/',
-  '/index.html',
-  '/app.bundle.js',
-  '/app.css',
-  '/favicon.png',
-  '/images/logo.png',
+  basePath,
+  basePath + 'index.html',
+  basePath + 'app.bundle.js',
+  basePath + 'app.css',
+  basePath + 'favicon.png',
+  basePath + 'images/logo.png',
 ];
 
 // Install event - cache assets
@@ -64,7 +73,7 @@ self.addEventListener('fetch', (event) => {
           .catch(() => {
             // If offline and request is for HTML, return cached index.html
             if (event.request.destination === 'document') {
-              return caches.match('/index.html');
+              return caches.match(basePath + 'index.html');
             }
           });
       })
@@ -78,8 +87,8 @@ self.addEventListener('push', (event) => {
   let notificationData = {
     title: 'StoryMap',
     body: 'Anda memiliki notifikasi baru',
-    icon: '/images/logo.png',
-    badge: '/images/logo.png',
+    icon: basePath + 'images/logo.png',
+    badge: basePath + 'images/logo.png',
     tag: 'storymap-notification',
     requireInteraction: false,
   };
@@ -121,13 +130,13 @@ self.addEventListener('notificationclick', (event) => {
       .then((clientList) => {
         // If app is already open, focus it
         for (let client of clientList) {
-          if (client.url === '/' && 'focus' in client) {
+          if (client.url.includes(basePath) && 'focus' in client) {
             return client.focus();
           }
         }
         // Otherwise open new window
         if (clients.openWindow) {
-          return clients.openWindow('/');
+          return clients.openWindow(basePath);
         }
       })
   );
