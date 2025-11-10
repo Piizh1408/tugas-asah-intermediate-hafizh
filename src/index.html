@@ -15,13 +15,56 @@
 
     <title>StoryMap - Cerita Perjalanan Bersama</title>
     <script>
-      // Fix manifest path untuk GitHub Pages subfolder
+      // Fix manifest path untuk GitHub Pages subfolder - HARUS DI AWAL!
       (function() {
-        const path = window.location.pathname;
-        const basePath = path.endsWith('/') ? path : path.substring(0, path.lastIndexOf('/') + 1);
+        // Eksekusi segera, sebelum browser load manifest
+        const getBasePath = () => {
+          const pathname = window.location.pathname;
+          
+          // Jika root
+          if (pathname === '/') {
+            return '/';
+          }
+          
+          // Jika sudah ada trailing slash
+          if (pathname.endsWith('/')) {
+            return pathname;
+          }
+          
+          // Jika ada index.html
+          if (pathname.includes('/index.html')) {
+            return pathname.substring(0, pathname.indexOf('/index.html') + 1);
+          }
+          
+          // Ambil sampai slash terakhir
+          const lastSlash = pathname.lastIndexOf('/');
+          if (lastSlash > 0) {
+            return pathname.substring(0, lastSlash + 1);
+          }
+          
+          // Fallback: build dari segments
+          const segments = pathname.split('/').filter(s => s);
+          if (segments.length > 0) {
+            return '/' + segments.join('/') + '/';
+          }
+          
+          return '/';
+        };
+        
+        const basePath = getBasePath();
+        const normalizedBasePath = basePath.endsWith('/') ? basePath : basePath + '/';
+        const finalBasePath = normalizedBasePath.startsWith('/') ? normalizedBasePath : '/' + normalizedBasePath;
+        
+        // Update manifest link SEBELUM browser load
         const manifestLink = document.getElementById('manifest-link');
-        if (manifestLink && basePath !== '/') {
-          manifestLink.href = basePath + 'manifest.json';
+        if (manifestLink) {
+          if (finalBasePath !== '/') {
+            manifestLink.href = finalBasePath + 'manifest.json';
+            console.log('✅ Manifest path fixed to:', manifestLink.href);
+          } else {
+            manifestLink.href = 'manifest.json';
+            console.log('✅ Using relative manifest path');
+          }
         }
       })();
     </script>

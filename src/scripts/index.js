@@ -9,29 +9,88 @@ if ('serviceWorker' in navigator) {
   // Register immediately when page loads
   window.addEventListener('load', async () => {
     try {
-      // Get base path untuk GitHub Pages subfolder
-      // Contoh: https://piizh1408.github.io/tugas-asah-intermediate-hafizh/
-      // Base path akan menjadi: /tugas-asah-intermediate-hafizh/
-      const getBasePath = () => {
-        const path = window.location.pathname;
-        // Jika path adalah root atau index.html, ambil path sampai sebelum filename
-        if (path === '/' || path.endsWith('/index.html') || path.endsWith('/')) {
-          return path.endsWith('/') ? path : path.substring(0, path.lastIndexOf('/') + 1);
+      // Unregister semua service worker lama dengan scope root (jika ada)
+      // Ini penting untuk menghindari konflik dengan service worker lama
+      try {
+        const registrations = await navigator.serviceWorker.getRegistrations();
+        for (const registration of registrations) {
+          if (registration.scope === window.location.origin + '/') {
+            console.log('🗑️ Unregistering old service worker with root scope:', registration.scope);
+            await registration.unregister();
+          }
         }
-        // Jika ada path lain, ambil base path
-        return path.substring(0, path.lastIndexOf('/') + 1);
+      } catch (unregError) {
+        console.warn('Warning: Could not unregister old service workers:', unregError);
+      }
+      
+      // Get base path untuk GitHub Pages subfolder
+      const getBasePath = () => {
+        const pathname = window.location.pathname;
+        console.log('📍 Current pathname:', pathname);
+        console.log('📍 Current href:', window.location.href);
+        
+        // Jika pathname adalah '/' (root), return '/'
+        if (pathname === '/') {
+          console.log('📍 Detected root path');
+          return '/';
+        }
+        
+        // Jika pathname berakhir dengan '/', itu adalah base path
+        if (pathname.endsWith('/')) {
+          console.log('📍 Detected base path with trailing slash:', pathname);
+          return pathname;
+        }
+        
+        // Jika pathname berakhir dengan '/index.html' atau '/index.html#/...'
+        if (pathname.includes('/index.html')) {
+          const base = pathname.substring(0, pathname.indexOf('/index.html') + 1);
+          console.log('📍 Detected base path from index.html:', base);
+          return base;
+        }
+        
+        // Untuk path lainnya, ambil sampai slash terakhir + 1
+        const lastSlash = pathname.lastIndexOf('/');
+        if (lastSlash > 0) {
+          const base = pathname.substring(0, lastSlash + 1);
+          console.log('📍 Detected base path from last slash:', base);
+          return base;
+        }
+        
+        // Fallback: jika ada segment path (bukan root), gunakan path sampai slash terakhir
+        const segments = pathname.split('/').filter(s => s);
+        if (segments.length > 0) {
+          const base = '/' + segments.join('/') + '/';
+          console.log('📍 Detected base path from segments:', base);
+          return base;
+        }
+        
+        console.log('📍 Using root as fallback');
+        return '/';
       };
       
       const basePath = getBasePath();
-      const swPath = basePath + 'sw.js';
-      const swScope = basePath;
+      // Normalize: pastikan basePath selalu berakhir dengan '/'
+      const normalizedBasePath = basePath.endsWith('/') ? basePath : basePath + '/';
+      // Pastikan basePath dimulai dengan '/'
+      const finalBasePath = normalizedBasePath.startsWith('/') ? normalizedBasePath : '/' + normalizedBasePath;
       
-      console.log('Registering Service Worker:', swPath, 'with scope:', swScope);
+      const swPath = finalBasePath + 'sw.js';
+      const swScope = finalBasePath;
       
+      console.log('📁 Final base path:', finalBasePath);
+      console.log('📁 Service Worker path:', swPath);
+      console.log('📁 Service Worker scope:', swScope);
+      console.log('📁 Full URL:', window.location.href);
+      
+      // Register service worker dengan path dan scope yang benar
       const registration = await navigator.serviceWorker.register(swPath, {
         scope: swScope
       });
-      console.log('✅ Service Worker registered successfully:', registration.scope);
+      console.log('✅ Service Worker registered successfully!');
+      console.log('✅ Registration scope:', registration.scope);
+      console.log('✅ Registration active:', registration.active);
+      console.log('✅ Registration installing:', registration.installing);
+      console.log('✅ Registration waiting:', registration.waiting);
       
       // Wait for service worker to be ready
       await navigator.serviceWorker.ready;
@@ -40,15 +99,21 @@ if ('serviceWorker' in navigator) {
       // Check for updates
       registration.addEventListener('updatefound', () => {
         const newWorker = registration.installing;
+        console.log('🔄 New service worker found, state:', newWorker.state);
         newWorker.addEventListener('statechange', () => {
+          console.log('🔄 Service worker state changed to:', newWorker.state);
           if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-            console.log('New service worker available');
+            console.log('✅ New service worker installed and active');
           }
         });
       });
     } catch (error) {
       console.error('❌ Service Worker registration failed:', error);
-      console.error('Error details:', error.message);
+      console.error('❌ Error name:', error.name);
+      console.error('❌ Error message:', error.message);
+      console.error('❌ Error stack:', error.stack);
+      console.error('❌ Current location:', window.location.href);
+      console.error('❌ Current pathname:', window.location.pathname);
     }
   });
 
