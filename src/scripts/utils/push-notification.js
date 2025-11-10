@@ -66,21 +66,66 @@ export function verifyVapidKey() {
 
 // Subscribe to push notifications
 export async function subscribeToPushNotifications() {
-  if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
-    console.warn('Push notifications are not supported');
-    return null;
+  // Check browser support
+  if (!('serviceWorker' in navigator)) {
+    throw new Error('Service Worker tidak didukung di browser ini. Gunakan browser modern seperti Chrome, Firefox, atau Edge.');
+  }
+
+  if (!('PushManager' in window)) {
+    throw new Error('Push Notification tidak didukung di browser ini. Gunakan browser modern seperti Chrome, Firefox, atau Edge.');
+  }
+
+  // Check if we're on HTTPS or localhost
+  if (window.location.protocol !== 'https:' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+    throw new Error('Push Notification hanya bekerja di HTTPS atau localhost. Aplikasi harus di-deploy dengan HTTPS.');
   }
 
   try {
-    // Request notification permission
-    const permission = await Notification.requestPermission();
-    if (permission !== 'granted') {
-      console.warn('Notification permission denied');
-      return null;
+    // Wait for service worker to be ready (dengan timeout)
+    let registration = null;
+    const maxWaitTime = 10000; // 10 seconds
+    const startTime = Date.now();
+    
+    while (!registration && (Date.now() - startTime) < maxWaitTime) {
+      try {
+        registration = await navigator.serviceWorker.ready;
+        if (registration) break;
+      } catch (e) {
+        // Service worker belum ready, tunggu sebentar
+        await new Promise(resolve => setTimeout(resolve, 500));
+      }
     }
 
-    // Register service worker
-    const registration = await navigator.serviceWorker.ready;
+    if (!registration) {
+      throw new Error('Service Worker belum siap. Pastikan Service Worker sudah ter-register dengan benar. Refresh halaman dan coba lagi.');
+    }
+
+    console.log('✅ Service Worker ready for push notification');
+
+    // Check if already subscribed
+    const existingSubscription = await registration.pushManager.getSubscription();
+    if (existingSubscription) {
+      console.log('✅ Already subscribed to push notifications');
+      return existingSubscription;
+    }
+
+    // Request notification permission
+    console.log('🔔 Requesting notification permission...');
+    const permission = await Notification.requestPermission();
+    
+    if (permission === 'denied') {
+      throw new Error('Izin notifikasi ditolak. Untuk mengaktifkan notifikasi:\n1. Klik icon gembok/kunci di address bar\n2. Set "Notifications" ke "Allow"\n3. Refresh halaman dan coba lagi');
+    }
+    
+    if (permission === 'default') {
+      throw new Error('Izin notifikasi belum diberikan. Silakan berikan izin notifikasi ketika diminta, kemudian coba lagi.');
+    }
+    
+    if (permission !== 'granted') {
+      throw new Error('Izin notifikasi tidak diberikan. Status: ' + permission);
+    }
+
+    console.log('✅ Notification permission granted');
 
     // Get VAPID public key dari config (sesuai dokumentasi Story API)
     const vapidPublicKey = getVapidPublicKey();
@@ -88,15 +133,41 @@ export async function subscribeToPushNotifications() {
     if (!vapidPublicKey) {
       throw new Error('VAPID public key tidak ditemukan di config');
     }
+
+    // Verify VAPID key format
+    try {
+      const testKey = urlBase64ToUint8Array(vapidPublicKey);
+      if (testKey.length !== 65) {
+        throw new Error('VAPID key format tidak valid');
+      }
+    } catch (keyError) {
+      throw new Error('VAPID public key tidak valid. Pastikan VAPID key dari dokumentasi Story API sudah benar.');
+    }
+    
+    console.log('✅ VAPID key valid');
     
     // Convert VAPID key dan subscribe
     const applicationServerKey = urlBase64ToUint8Array(vapidPublicKey);
     
+    console.log('📡 Subscribing to push notifications...');
+    
     // Subscribe to push dengan VAPID key dari dokumentasi Story API
-    const subscription = await registration.pushManager.subscribe({
-      userVisibleOnly: true,
-      applicationServerKey: applicationServerKey,
-    });
+    let subscription;
+    try {
+      subscription = await registration.pushManager.subscribe({
+        userVisibleOnly: true,
+        applicationServerKey: applicationServerKey,
+      });
+      console.log('✅ Push subscription created in browser');
+    } catch (subscribeError) {
+      console.error('❌ Error subscribing to push:', subscribeError);
+      if (subscribeError.name === 'NotAllowedError') {
+        throw new Error('Push subscription tidak diizinkan. Pastikan Service Worker sudah aktif dan browser mendukung push notification.');
+      } else if (subscribeError.message && subscribeError.message.includes('VAPID')) {
+        throw new Error('VAPID key tidak valid. Pastikan menggunakan VAPID key yang benar dari dokumentasi Story API.');
+      }
+      throw new Error('Gagal subscribe ke push notification: ' + subscribeError.message);
+    }
 
     // Send subscription to server menggunakan endpoint sesuai dokumentasi Story API
     const token = localStorage.getItem('authToken');
@@ -150,8 +221,12 @@ export async function subscribeToPushNotifications() {
     console.log('✅ Push notification subscription ready');
     return subscription;
   } catch (error) {
-    console.error('Error subscribing to push notifications:', error);
-    return null;
+    console.error('❌ Error subscribing to push notifications:', error);
+    // Re-throw error dengan message yang lebih jelas
+    if (error.message) {
+      throw error;
+    }
+    throw new Error('Gagal mengaktifkan push notification: ' + (error.toString() || 'Unknown error'));
   }
 }
 

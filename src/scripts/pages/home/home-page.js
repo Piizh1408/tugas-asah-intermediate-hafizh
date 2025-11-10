@@ -519,6 +519,23 @@ export default class HomePage {
         } else {
           // Subscribe
           try {
+            // Pastikan service worker ready sebelum subscribe
+            if ('serviceWorker' in navigator) {
+              try {
+                await navigator.serviceWorker.ready;
+              } catch (swError) {
+                console.warn('Service worker belum ready, menunggu...');
+                // Tunggu maksimal 5 detik
+                await new Promise((resolve, reject) => {
+                  const timeout = setTimeout(() => reject(new Error('Service Worker timeout')), 5000);
+                  navigator.serviceWorker.ready.then(() => {
+                    clearTimeout(timeout);
+                    resolve();
+                  }).catch(reject);
+                });
+              }
+            }
+
             const subscription = await subscribeToPushNotifications();
             if (subscription) {
               newButton.textContent = '🔔 Matikan Notifikasi';
@@ -528,16 +545,38 @@ export default class HomePage {
               // Show success message
               const successMsg = document.createElement('div');
               successMsg.className = 'success-message';
-              successMsg.textContent = 'Notifikasi push telah diaktifkan! Anda bisa test via DevTools > Application > Service Workers > Push';
+              successMsg.textContent = '✅ Notifikasi push telah diaktifkan! Push notification siap digunakan.';
               successMsg.style.display = 'block';
-              document.getElementById('stories-list').insertBefore(successMsg, document.getElementById('stories-list').firstChild);
-              setTimeout(() => successMsg.remove(), 5000);
+              const storiesList = document.getElementById('stories-list');
+              if (storiesList) {
+                storiesList.insertBefore(successMsg, storiesList.firstChild);
+                setTimeout(() => successMsg.remove(), 5000);
+              }
+              
+              console.log('✅ Push notification activated successfully');
             } else {
-              alert('Gagal mengaktifkan notifikasi push. Pastikan Anda memberikan izin notifikasi.');
+              throw new Error('Subscription tidak berhasil dibuat. Periksa console untuk detail error.');
             }
           } catch (subError) {
-            console.error('Error subscribing:', subError);
-            alert('Gagal mengaktifkan notifikasi push: ' + subError.message);
+            console.error('❌ Error subscribing to push notification:', subError);
+            
+            // Show detailed error message
+            let errorMessage = 'Gagal mengaktifkan notifikasi push.\n\n';
+            
+            if (subError.message) {
+              errorMessage += subError.message;
+            } else {
+              errorMessage += 'Error: ' + subError.toString();
+            }
+            
+            errorMessage += '\n\nPenyebab umum:';
+            errorMessage += '\n1. Service Worker belum ter-register';
+            errorMessage += '\n2. Izin notifikasi ditolak';
+            errorMessage += '\n3. Browser tidak mendukung push notification';
+            errorMessage += '\n4. VAPID key tidak valid';
+            errorMessage += '\n\nSilakan cek console untuk detail error.';
+            
+            alert(errorMessage);
           }
         }
       } catch (error) {
