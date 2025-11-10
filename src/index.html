@@ -15,56 +15,48 @@
 
     <title>StoryMap - Cerita Perjalanan Bersama</title>
     <script>
-      // Fix manifest path untuk GitHub Pages subfolder - HARUS DI AWAL!
+      // Fix manifest path untuk GitHub Pages subfolder - HARUS DI AWAL SEBELUM BROWSER LOAD!
+      // Script ini harus synchronous dan berjalan sebelum browser parse manifest link
       (function() {
-        // Eksekusi segera, sebelum browser load manifest
-        const getBasePath = () => {
+        'use strict';
+        try {
           const pathname = window.location.pathname;
+          let basePath = '/';
           
-          // Jika root
-          if (pathname === '/') {
-            return '/';
+          // Deteksi base path dari pathname
+          if (pathname && pathname !== '/') {
+            if (pathname.endsWith('/')) {
+              basePath = pathname;
+            } else if (pathname.includes('/index.html')) {
+              basePath = pathname.substring(0, pathname.indexOf('/index.html') + 1);
+            } else {
+              const lastSlash = pathname.lastIndexOf('/');
+              if (lastSlash > 0) {
+                basePath = pathname.substring(0, lastSlash + 1);
+              } else {
+                const segments = pathname.split('/').filter(s => s);
+                if (segments.length > 0) {
+                  basePath = '/' + segments.join('/') + '/';
+                }
+              }
+            }
           }
           
-          // Jika sudah ada trailing slash
-          if (pathname.endsWith('/')) {
-            return pathname;
+          // Update manifest link dengan base path yang benar
+          const manifestLink = document.getElementById('manifest-link');
+          if (manifestLink) {
+            if (basePath === '/') {
+              // Root: gunakan relative path
+              manifestLink.href = 'manifest.json';
+            } else {
+              // Subfolder: gunakan absolute path dengan base path
+              manifestLink.href = basePath + 'manifest.json';
+            }
+            // Force browser to use new path
+            manifestLink.setAttribute('href', manifestLink.href);
           }
-          
-          // Jika ada index.html
-          if (pathname.includes('/index.html')) {
-            return pathname.substring(0, pathname.indexOf('/index.html') + 1);
-          }
-          
-          // Ambil sampai slash terakhir
-          const lastSlash = pathname.lastIndexOf('/');
-          if (lastSlash > 0) {
-            return pathname.substring(0, lastSlash + 1);
-          }
-          
-          // Fallback: build dari segments
-          const segments = pathname.split('/').filter(s => s);
-          if (segments.length > 0) {
-            return '/' + segments.join('/') + '/';
-          }
-          
-          return '/';
-        };
-        
-        const basePath = getBasePath();
-        const normalizedBasePath = basePath.endsWith('/') ? basePath : basePath + '/';
-        const finalBasePath = normalizedBasePath.startsWith('/') ? normalizedBasePath : '/' + normalizedBasePath;
-        
-        // Update manifest link SEBELUM browser load
-        const manifestLink = document.getElementById('manifest-link');
-        if (manifestLink) {
-          if (finalBasePath !== '/') {
-            manifestLink.href = finalBasePath + 'manifest.json';
-            console.log('✅ Manifest path fixed to:', manifestLink.href);
-          } else {
-            manifestLink.href = 'manifest.json';
-            console.log('✅ Using relative manifest path');
-          }
+        } catch (e) {
+          console.error('Error fixing manifest path:', e);
         }
       })();
     </script>
