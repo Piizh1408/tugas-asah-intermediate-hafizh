@@ -85,8 +85,8 @@ self.addEventListener('push', (event) => {
   console.log('Service Worker: Push notification received');
   
   let notificationData = {
-    title: 'StoryMap',
-    body: 'Anda memiliki notifikasi baru',
+    title: 'Notifikasi Baru',
+    body: 'Ada data baru ditambahkan.',
     icon: basePath + 'images/logo.png',
     badge: basePath + 'images/logo.png',
     tag: 'storymap-notification',
